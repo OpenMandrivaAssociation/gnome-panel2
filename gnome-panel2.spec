@@ -14,15 +14,15 @@
 %define libnamedev %mklibname -d panel-applet- %{api_version}
 
 %define in_process_applets 0
-
+%define oname gnome-panel
 
 Summary:	The core programs for the GNOME GUI desktop environment
-Name:		gnome-panel
+Name:		gnome-panel2
 Version: 2.32.1
-Release: %mkrel 4
+Release: %mkrel 5
 License:	GPLv2+ and LGPLv2+
 Group:		Graphical desktop/GNOME
-Source0:	ftp://ftp.gnome.org/pub/GNOME/sources/%{name}/%{name}-%{version}.tar.bz2
+Source0:	ftp://ftp.gnome.org/pub/GNOME/sources/%{oname}/%{oname}-%{version}.tar.bz2
 Source1:	mandriva-panel.png
 
 # (fc) 2.0.1-2mdk  use xlock instead of xscreensaver to lock root desktop
@@ -50,7 +50,9 @@ BuildRequires:	libwnck-devel >= %{req_libwnck_version}
 BuildRequires:	libxres-devel
 BuildRequires:	libpng-devel
 BuildRequires:	librsvg-devel
-BuildRequires:	libgweather-devel >= 2.27.90
+BuildRequires:	libgweather2-devel >= 2.27.90
+BuildRequires:	libice-devel
+BuildRequires:	libsm-devel
 BuildRequires:	gobject-introspection-devel
 BuildRequires:	polkit-1-devel
 BuildRequires:	rarian
@@ -60,8 +62,8 @@ BuildRequires:	glib2-devel >= %req_glib_version
 BuildRequires:	gtk+2-devel >= %{req_gtk_version}
 BuildRequires:	libgnomeui2-devel >= %{req_gnomeui_version}
 BuildRequires:	libGConf2-devel >= %{req_gconf2_version}
-BuildRequires:	evolution-data-server-devel >= 1.5.3
-BuildRequires:  gnome-menus-devel >= 2.27.92
+BuildRequires:	evolution-data-server2-devel >= 1.5.3
+BuildRequires:  gnome-menus2-devel >= 2.27.92
 BuildRequires:  libcanberra-gtk-devel
 BuildRequires:  automake gettext-devel
 BuildRequires:	gtk-doc
@@ -75,7 +77,7 @@ Requires:	polkit-agent
 Requires:	GConf2 >= %{req_gconf2_version}
 Suggests:	gnome-applets
 Requires:	glib2 >= %req_glib_version
-Requires:	gnome-menus
+Requires:	gnome-menus2
 Requires:	alacarte
 
 # for screen locking and search function in panel
@@ -99,9 +101,6 @@ basic applets for the panel.
 Summary:	%{summary}
 Group:		System/Libraries
 
-Provides:	libpanel-applet = %{version}-%{release}
-Provides:	libpanel-applet-%{api_version} = %{version}-%{release}
-
 %description -n	%{libname}
 Panel libraries for running GNOME panels.
 %package -n	%{libname2}
@@ -116,8 +115,6 @@ Panel libraries for running GNOME panels.
 %package -n	%{libnamedev}
 Summary:	Static libraries, include files for GNOME panel
 Group:		Development/GNOME and GTK+
-Provides:	%{name}-devel = %{version}-%{release}
-Provides:	libpanel-applet-devel = %{version}-%{release}
 Provides:	libpanel-applet-%{api_version}-devel = %{version}-%{release}
 Requires:	%{libname} = %{version}
 Requires:	%{libname2} = %{version}-%{release}
@@ -127,7 +124,7 @@ Obsoletes: %mklibname -d panel-applet- 2 0
 Panel libraries and header files for creating GNOME panels.
 
 %prep
-%setup -q
+%setup -q -n %oname-%version
 %apply_patches
 
 #needed by patch2,patch23
@@ -144,32 +141,27 @@ autoreconf
 make
 
 %install
-rm -rf $RPM_BUILD_ROOT %name-2.0.lang
+rm -rf $RPM_BUILD_ROOT %oname-2.0.lang
 
 GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1 %makeinstall_std
 
-install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/gnome-panel/pixmaps
-
+install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/gnome-panel/pixmaps-
 #remove old files
 rm -rf %buildroot%_datadir/omf/gnome-panel
-
-%find_lang %name-2.0 --with-gnome --all-name
+ 
+%find_lang %oname-2.0 --with-gnome --all-name
 for omf in %buildroot%_datadir/omf/*/{*-??.omf,*-??_??.omf};do
-echo "%lang($(basename $omf|sed -e s/.*-// -e s/.omf//)) $(echo $omf|sed s!%buildroot!!)" >> %name-2.0.lang
+echo "%lang($(basename $omf|sed -e s/.*-// -e s/.omf//)) $(echo $omf|sed s!%buildroot!!)" >> %oname-2.0.lang
 done
 
 #remove unpackaged files
-rm -rf $RPM_BUILD_ROOT%{_datadir}/gnome-panelrc $RPM_BUILD_ROOT%{_localstatedir}/lib/scrollkeeper $RPM_BUILD_ROOT%{_libexecdir}/gnome-panel/*.{a,la}
+rm -rf $RPM_BUILD_ROOT%{_datadir}/gnome-panelrc $RPM_BUILD_ROOT%{_localstatedir}/lib/scrollkeeper $RPM_BUILD_ROOT%{_libexecdir}/gnome-panel/*.{a,la} %buildroot%{_libdir}/*.la
 
 
 %clean
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
 %define schemas clock fish panel-compatibility panel-general panel-global panel-object panel-toplevel window-list workspace-switcher notification_area_applet
-
-%if %mdkversion < 200900
-%post -p /sbin/ldconfig -n %{libname}
-%endif
 
 %post
 %update_scrollkeeper 
@@ -186,15 +178,11 @@ gconftool-2 --direct --config-source=$GCONF_CONFIG_SOURCE --load %{_sysconfdir}/
 %preun
 %preun_uninstall_gconf_schemas %{schemas}
 
-%if %mdkversion < 200900
-%postun -p /sbin/ldconfig -n %{libname}
-%endif
-
 %postun
 %clean_scrollkeeper
 %clean_icon_cache hicolor
 
-%files -f %name-2.0.lang
+%files -f %oname-2.0.lang
 %defattr (-, root, root)
 %doc AUTHORS COPYING NEWS README
 %{_sysconfdir}/gconf/schemas/clock.schemas
@@ -251,7 +239,6 @@ gconftool-2 --direct --config-source=$GCONF_CONFIG_SOURCE --load %{_sysconfdir}/
 %doc ChangeLog
 %doc %{_datadir}/gtk-doc/html/*
 %{_includedir}/*
-%attr(644,root,root) %{_libdir}/*.la
 %{_libdir}/libpanel*.so
 %{_libdir}/pkgconfig/*
 %_datadir/gir-1.0/PanelApplet-3.0.gir
