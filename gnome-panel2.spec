@@ -70,6 +70,7 @@ BuildRequires:  automake gettext-devel
 BuildRequires:	gtk-doc
 BuildRequires:	gnome-common
 BuildRequires:	intltool
+BuildRequires:	pkgconfig(NetworkManager)
 Requires(post):	scrollkeeper
 Requires(postun): scrollkeeper
 Requires:	gnome-session
