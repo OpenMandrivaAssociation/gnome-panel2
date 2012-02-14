@@ -42,6 +42,7 @@ Patch21:	gnome-panel-2.28.0-about-mandriva.patch
 Patch22:	gnome-panel-2.30.0-panel-padding.patch
 # (fc) add padding for icons in notification area (GNOME bug #583273)
 Patch23:	gnome-panel-2.31.6-icon-padding.patch
+Patch24:	gnome-panel-2.32.1-link-against-gmodule.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 URL:		http://www.gnome.org/
 BuildRequires:	gnome-desktop-devel >= %{req_gnomedesktop_version}
