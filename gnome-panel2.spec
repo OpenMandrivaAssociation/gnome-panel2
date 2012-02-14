@@ -150,9 +150,6 @@ install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/gnome-panel/pixmaps-
 rm -rf %buildroot%_datadir/omf/gnome-panel
  
 %find_lang %oname-2.0 --with-gnome --all-name
-for omf in %buildroot%_datadir/omf/*/{*-??.omf,*-??_??.omf};do
-echo "%lang($(basename $omf|sed -e s/.*-// -e s/.omf//)) $(echo $omf|sed s!%buildroot!!)" >> %oname-2.0.lang
-done
 
 #remove unpackaged files
 rm -rf $RPM_BUILD_ROOT%{_datadir}/gnome-panelrc $RPM_BUILD_ROOT%{_localstatedir}/lib/scrollkeeper $RPM_BUILD_ROOT%{_libexecdir}/gnome-panel/*.{a,la} %buildroot%{_libdir}/*.la
@@ -221,8 +218,6 @@ gconftool-2 --direct --config-source=$GCONF_CONFIG_SOURCE --load %{_sysconfdir}/
 %_datadir/gnome-panel
 %{_datadir}/gnome-2.0/ui/*
 %{_datadir}/idl/*
-%dir %{_datadir}/omf/*
-%{_datadir}/omf/*/*-C.omf
 %{_datadir}/icons/hicolor/*/apps/*
 
 %files -n %{libname}
