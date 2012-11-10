@@ -1,0 +1,1556 @@
+diff -p -up gnome-panel-2.31.92/gnome-panel/main.c.mdvcustomizations gnome-panel-2.31.92/gnome-panel/main.c
+--- gnome-panel-2.31.92/gnome-panel/main.c.mdvcustomizations	2010-06-23 01:00:28.000000000 +0200
++++ gnome-panel-2.31.92/gnome-panel/main.c	2010-09-14 15:24:11.000000000 +0200
+@@ -99,6 +99,8 @@ main (int argc, char **argv)
+ 		return -1;
+ 	}
+ 
++	panel_global_config_init_mdv_customization ();
++
+ 	panel_action_protocol_init ();
+ 	panel_multiscreen_init ();
+ 	panel_init_stock_icons_and_items ();
+diff -p -up gnome-panel-2.31.92/gnome-panel/panel-addto.c.mdvcustomizations gnome-panel-2.31.92/gnome-panel/panel-addto.c
+--- gnome-panel-2.31.92/gnome-panel/panel-addto.c.mdvcustomizations	2010-06-23 01:26:21.000000000 +0200
++++ gnome-panel-2.31.92/gnome-panel/panel-addto.c	2010-09-14 15:24:11.000000000 +0200
+@@ -46,6 +46,7 @@
+ #include "panel-lockdown.h"
+ #include "panel-util.h"
+ #include "panel-profile.h"
++#include "panel-config-global.h"
+ #include "panel-addto.h"
+ #include "panel-icon-names.h"
+ 
+@@ -220,6 +221,10 @@ panel_addto_prepend_internal_applets (GS
+ 			internal_addto_items [i].description = _(internal_addto_items [i].description);
+ 		}
+ 
++		if (panel_global_config_get_mdv_customization () && internal_addto_items [i].icon && (strcmp(internal_addto_items [i].icon,PANEL_ICON_MAIN_MENU) == 0 )) {
++			internal_addto_items [i].icon = "mandriva";
++		}
++
+                 list = g_slist_prepend (list, &internal_addto_items [i]);
+         }
+ 
+diff -p -up gnome-panel-2.31.92/gnome-panel/panel-compatibility.schemas.mdvcustomizations gnome-panel-2.31.92/gnome-panel/panel-compatibility.schemas
+--- gnome-panel-2.31.92/gnome-panel/panel-compatibility.schemas.mdvcustomizations	2010-02-09 13:32:08.000000000 +0100
++++ gnome-panel-2.31.92/gnome-panel/panel-compatibility.schemas	2010-09-14 15:24:11.000000000 +0200
+@@ -23,7 +23,7 @@
+         <owner>panel</owner>
+         <type>list</type>
+ 	<list_type>string</list_type>
+-        <default>[00000001,00000002]</default>
++        <default>[bottom_panel]</default>
+ 	<locale name="C"/>
+       </schema>     
+ 
+@@ -32,7 +32,7 @@
+         <owner>panel</owner>
+         <type>list</type>
+ 	<list_type>string</list_type>
+-        <default>[00000001,00000002,00000003,00000004,show_desktop_button]</default>
++        <default>[tasklist_applet,pager_applet,clock_applet,show_desktop_button,tray_applet]</default>
+ 	<locale name="C"/>
+       </schema>     
+ 
+@@ -41,504 +41,759 @@
+         <owner>panel</owner>
+         <type>list</type>
+ 	<list_type>string</list_type>
+-        <default>[00000001,00000002]</default>
++        <default>[main_menu,webbrowser,mcc,terminal,evolution]</default>
+ 	<locale name="C"/>
+       </schema>     
+-
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_type</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default>edge-panel</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_size</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_size</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default>panel-size-x-small</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_hide_mode</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_hide_mode</key>
+         <owner>panel</owner>
+         <type>int</type>
+         <default>0</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_hide_state</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_hide_state</key>
+         <owner>panel</owner>
+         <type>int</type>
+         <default>0</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/screen</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/screen</key>
+         <owner>panel</owner>
+         <type>int</type>
+         <default>0</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/monitor</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/monitor</key>
+         <owner>panel</owner>
+         <type>int</type>
+         <default>0</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/screen_edge</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/screen_edge</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default>panel-edge-bottom</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/hide_buttons_enabled</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/hide_buttons_enabled</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>false</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/hide_button_pixmaps_enabled</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/hide_button_pixmaps_enabled</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>false</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_background_type</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_background_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default>no-background</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_background_pixmap</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_background_pixmap</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default></default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_background_pixmap_fit</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_background_pixmap_fit</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>true</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_background_pixmap_stretch</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_background_pixmap_stretch</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>false</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_background_pixmap_rotate</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_background_pixmap_rotate</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>true</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_background_color</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_background_color</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default>#ffffff</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000001/panel_background_color_alpha</key>
++        <key>/schemas/apps/panel/default_profiles/medium/panels/bottom_panel/panel_background_color_alpha</key>
+         <owner>panel</owner>
+         <type>int</type>
+         <default>65535</default>
+-	<locale name="C"/>
+-      </schema>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
++</schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000001/object_type</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/main_menu/object_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>launcher-object</default>
+-	<locale name="C"/>
++        <default>menu-object</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-     
++
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000001/launcher_location</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/main_menu/panel_id</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>applications:///nautilus.desktop</default>
+-	<locale name="C"/>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000001/panel_id</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/main_menu/path</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>00000002</default>
+-	<locale name="C"/>
++        <default>applications:///</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-     
++
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000001/position</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/main_menu/main-menu</key>
+         <owner>panel</owner>
+-        <type>int</type>
+-        <default>20</default>
+-	<locale name="C"/>
++        <type>bool</type>
++        <default>true</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-     
++
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000001/panel_right_stick</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/main_menu/global-menu</key>
+         <owner>panel</owner>
+         <type>bool</type>
+-        <default>false</default>
+-	<locale name="C"/>
++        <default>true</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-     
++
++      <schema>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/main_menu/position</key>
++        <owner>panel</owner>
++        <type>int</type>
++        <default>0</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
++      </schema>
++
++      <!-- The person who made this a bitfield stored as an int needs some buttkicking -->
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000002/object_type</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/main_menu/main-menu-flags</key>
++        <owner>panel</owner>
++        <type>int</type>
++        <default>24592</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
++      </schema>
++
++      <!-- Launchers -->
++
++      <schema>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/webbrowser/object_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default>launcher-object</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000002/launcher_location</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/webbrowser/launcher_location</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>applications:///System/gnome-terminal.desktop</default>
+-	<locale name="C"/>
++	<default>file:///usr/share/applications/firefox.desktop</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000002/panel_id</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/webbrowser/panel_id</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>00000002</default>
+-	<locale name="C"/>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000002/position</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/webbrowser/position</key>
+         <owner>panel</owner>
+         <type>int</type>
+-        <default>25</default>
+-	<locale name="C"/>
++        <default>60</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/objects/00000002/panel_stick</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/webbrowser/panel_stick</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>false</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-     
+-      <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/object_type</key>
++
++    <schema>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/evolution/object_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>bonobo-applet</default>
+-	<locale name="C"/>
++        <default>launcher-object</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-      
++
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/panel_id</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/evolution/launcher_location</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>00000001</default>
+-	<locale name="C"/>
++	<default>file:///usr/share/applications/evolution.desktop</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/position</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/evolution/panel_id</key>
+         <owner>panel</owner>
+-        <type>int</type>
+-        <default>0</default>
+-	<locale name="C"/>
++        <type>string</type>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-      
++     
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/bonobo_iid</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/evolution/position</key>
+         <owner>panel</owner>
+-        <type>string</type>
+-        <default>OAFIID:GNOME_ShowDesktopApplet</default>
+-	<locale name="C"/>
++        <type>int</type>
++        <default>80</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-
++     
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/panel_right_stick</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/evolution/panel_stick</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>false</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
++      </schema>
++ 
++    <schema>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/terminal/object_type</key>
++        <owner>panel</owner>
++        <type>string</type>
++        <default>launcher-object</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000001/object_type</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/terminal/launcher_location</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>bonobo-applet</default>
+-	<locale name="C"/>
++	<default>file:///usr/share/applications/gnome-terminal.desktop</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-      
++     
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000001/panel_id</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/terminal/panel_id</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>00000001</default>
+-	<locale name="C"/>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000001/position</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/terminal/position</key>
+         <owner>panel</owner>
+         <type>int</type>
+-        <default>1</default>
+-	<locale name="C"/>
++        <default>100</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-      
++     
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000001/bonobo_iid</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/terminal/panel_stick</key>
++        <owner>panel</owner>
++        <type>bool</type>
++        <default>false</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
++      </schema>
++     
++    <schema>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/mcc/object_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>OAFIID:GNOME_TasklistApplet</default>
+-	<locale name="C"/>
++        <default>launcher-object</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000001/panel_right_stick</key>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/mcc/launcher_location</key>
++        <owner>panel</owner>
++        <type>string</type>
++	<default>file:///usr/share/applications/mandriva-drakconf.desktop</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
++      </schema>
++     
++      <schema>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/mcc/panel_id</key>
++        <owner>panel</owner>
++        <type>string</type>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
++      </schema>
++     
++      <schema>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/mcc/position</key>
++        <owner>panel</owner>
++        <type>int</type>
++        <default>120</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
++      </schema>
++     
++      <schema>
++        <key>/schemas/apps/panel/default_profiles/medium/objects/mcc/panel_stick</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>false</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+-      <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000002/object_type</key>
++     <schema>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/object_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default>bonobo-applet</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000002/panel_id</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/panel_id</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>00000001</default>
+-	<locale name="C"/>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-      
++     
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000002/position</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/position</key>
+         <owner>panel</owner>
+         <type>int</type>
+-        <default>0</default>
+-	<locale name="C"/>
++        <default>1</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000002/bonobo_iid</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/bonobo_iid</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>OAFIID:GNOME_PagerApplet</default>
+-	<locale name="C"/>
++        <default>OAFIID:GNOME_ShowDesktopApplet</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-      
++
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000002/panel_right_stick</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/show_desktop_button/panel_right_stick</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>true</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
++
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000003/object_type</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tasklist_applet/object_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default>bonobo-applet</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000003/panel_id</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tasklist_applet/panel_id</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>00000002</default>
+-	<locale name="C"/>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000003/position</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tasklist_applet/position</key>
+         <owner>panel</owner>
+         <type>int</type>
+-        <default>-1</default>
+-	<locale name="C"/>
++        <default>150</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000003/bonobo_iid</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tasklist_applet/bonobo_iid</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>OAFIID:GNOME_MixerApplet</default>
+-	<locale name="C"/>
++        <default>OAFIID:GNOME_TasklistApplet</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000003/panel_right_stick</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tasklist_applet/panel_right_stick</key>
+         <owner>panel</owner>
+         <type>bool</type>
+-        <default>true</default>
+-	<locale name="C"/>
++        <default>false</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+- 
++
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000004/object_type</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/pager_applet/object_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+         <default>bonobo-applet</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000004/panel_id</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/pager_applet/panel_id</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>00000002</default>
+-	<locale name="C"/>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-     
++      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000004/position</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/pager_applet/position</key>
+         <owner>panel</owner>
+         <type>int</type>
+-        <default>-1</default>
+-	<locale name="C"/>
++        <default>2</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000004/bonobo_iid</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/pager_applet/bonobo_iid</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>OAFIID:GNOME_ClockApplet</default>
+-	<locale name="C"/>
++        <default>OAFIID:GNOME_PagerApplet</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-
++      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/applets/00000004/panel_right_stick</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/pager_applet/panel_right_stick</key>
+         <owner>panel</owner>
+         <type>bool</type>
+         <default>true</default>
+-	<locale name="C"/>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-      
++ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/panel_type</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/clock_applet/object_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>menu-panel</default>
+-	<locale name="C"/>
++        <default>bonobo-applet</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/panel_size</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/clock_applet/panel_id</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>panel-size-x-small</default>
+-	<locale name="C"/>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-
++     
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/screen</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/clock_applet/position</key>
+         <owner>panel</owner>
+         <type>int</type>
+-        <default>0</default>
+-	<locale name="C"/>
++        <default>-1</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-
++      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/monitor</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/clock_applet/bonobo_iid</key>
+         <owner>panel</owner>
+-        <type>int</type>
+-        <default>0</default>
+-	<locale name="C"/>
++        <type>string</type>
++        <default>OAFIID:GNOME_ClockApplet</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/panel_background_type</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/clock_applet/panel_right_stick</key>
+         <owner>panel</owner>
+-        <type>string</type>
+-        <default>no-background</default>
+-	<locale name="C"/>
++        <type>bool</type>
++        <default>true</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/panel_background_pixmap</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tray_applet/object_type</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default> </default>
+-	<locale name="C"/>
++        <default>bonobo-applet</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-
++      
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/panel_background_pixmap_fit</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tray_applet/panel_id</key>
+         <owner>panel</owner>
+-        <type>bool</type>
+-        <default>false</default>
+-	<locale name="C"/>
++        <type>string</type>
++        <default>bottom_panel</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+-
++     
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/panel_background_pixmap_stretch</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tray_applet/position</key>
+         <owner>panel</owner>
+-        <type>bool</type>
+-        <default>false</default>
+-	<locale name="C"/>
++        <type>int</type>
++        <default>3</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+       
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/panel_background_pixmap_rotate</key>
+-        <owner>panel</owner>
+-        <type>bool</type>
+-        <default>false</default>
+-	<locale name="C"/>
+-      </schema>
+-     
+-      <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/panel_background_color</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tray_applet/bonobo_iid</key>
+         <owner>panel</owner>
+         <type>string</type>
+-        <default>#000000</default>
+-	<locale name="C"/>
++        <default>OAFIID:GNOME_NotificationAreaApplet</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+       <schema>
+-        <key>/schemas/apps/panel/default_profiles/medium/panels/00000002/clock_format</key>
++        <key>/schemas/apps/panel/default_profiles/medium/applets/tray_applet/panel_right_stick</key>
+         <owner>panel</owner>
+-        <type>string</type>
+-        <default>%I:%M %p</default>
+-	<locale name="C"/>
++        <type>bool</type>
++        <default>true</default>
++        <locale name="C">
++          <short></short>
++          <long></long>
++        </locale>
+       </schema>
+ 
+   </schemalist>
+diff -p -up gnome-panel-2.31.92/gnome-panel/panel-config-global.c.mdvcustomizations gnome-panel-2.31.92/gnome-panel/panel-config-global.c
+--- gnome-panel-2.31.92/gnome-panel/panel-config-global.c.mdvcustomizations	2010-02-09 13:32:08.000000000 +0100
++++ gnome-panel-2.31.92/gnome-panel/panel-config-global.c	2010-09-14 15:24:11.000000000 +0200
+@@ -27,11 +27,14 @@
+ 
+ #include "panel-config-global.h"
+ 
++#include <unistd.h>
+ #include <string.h>
+ #include <gconf/gconf.h>
++#include <glib/gstdio.h>
+ 
+ #include "panel-globals.h"
+ #include "panel-gconf.h"
++#include "panel-util.h"
+ 
+ typedef struct {
+ 	guint               tooltips_enabled : 1;
+@@ -39,6 +42,7 @@ typedef struct {
+ 	guint               drawer_auto_close : 1;
+ 	guint               confirm_panel_remove : 1;
+ 	guint               highlight_when_over : 1;
++	guint               mdv_customization : 1;
+ } GlobalConfig;
+ 
+ static GlobalConfig global_config = { 0, };
+@@ -84,6 +88,27 @@ panel_global_config_get_confirm_panel_re
+ 	return global_config.confirm_panel_remove;
+ }
+ 
++gboolean
++panel_global_config_get_mdv_customization (void)
++{
++	return global_config.mdv_customization;
++}
++
++void
++panel_global_config_init_mdv_customization (void)
++{
++	const char *mdv_menu_style;
++
++	/* check if we disable mdv_customization */
++	mdv_menu_style = g_getenv("MDV_MENU_STYLE");
++
++	if (mdv_menu_style && g_ascii_strcasecmp (mdv_menu_style,"upstream") == 0)
++		global_config.mdv_customization = FALSE;
++	else
++		global_config.mdv_customization = TRUE;
++}
++
++
+ static void
+ panel_global_config_set_entry (GConfEntry *entry)
+ {
+diff -p -up gnome-panel-2.31.92/gnome-panel/panel-config-global.h.mdvcustomizations gnome-panel-2.31.92/gnome-panel/panel-config-global.h
+--- gnome-panel-2.31.92/gnome-panel/panel-config-global.h.mdvcustomizations	2010-02-09 13:32:08.000000000 +0100
++++ gnome-panel-2.31.92/gnome-panel/panel-config-global.h	2010-09-14 15:24:11.000000000 +0200
+@@ -37,6 +37,9 @@ gboolean panel_global_config_get_enable_
+ gboolean panel_global_config_get_drawer_auto_close    (void);
+ gboolean panel_global_config_get_tooltips_enabled     (void);
+ gboolean panel_global_config_get_confirm_panel_remove (void);
++gboolean panel_global_config_get_mdv_customization    (void);
++void     panel_global_config_init_mdv_customization   (void);
++
+ 
+ G_END_DECLS
+ 
+diff -p -up gnome-panel-2.31.92/gnome-panel/panel-default-setup.entries.mdvcustomizations gnome-panel-2.31.92/gnome-panel/panel-default-setup.entries
+--- gnome-panel-2.31.92/gnome-panel/panel-default-setup.entries.mdvcustomizations	2010-09-07 01:00:14.000000000 +0200
++++ gnome-panel-2.31.92/gnome-panel/panel-default-setup.entries	2010-09-14 15:31:16.000000000 +0200
+@@ -35,6 +35,9 @@
+           <value>
+             <string>email_launcher</string>
+           </value>
++          <value>
++            <string>mcc_launcher</string>
++          </value>
+         </list>
+       </value>
+     </entry>
+@@ -78,6 +81,13 @@
+       </value>
+     </entry>
+     <entry>
++      <key>toplevels/top_panel/padding</key>
++      <schema_key>/schemas/apps/panel/toplevels/padding</schema_key>
++      <value>
++        <int>8</int>
++      </value>
++    </entry>
++    <entry>
+       <key>toplevels/top_panel/orientation</key>
+       <schema_key>/schemas/apps/panel/toplevels/orientation</schema_key>
+       <value>
+@@ -91,6 +101,27 @@
+         <int>24</int>
+       </value>
+     </entry>
++    <entry>
++       <key>toplevels/top_panel/background/type</key>
++       <schema_key>/schemas/apps/panel/toplevels/background/type</schema_key>
++       <value>
++         <string>image</string>      
++       </value>
++    </entry>
++    <entry>
++       <key>toplevels/top_panel/background/image</key>
++       <schema_key>/schemas/apps/panel/toplevels/background/image</schema_key>
++      <value>
++        <string>/usr/share/gnome-panel/pixmaps/mandriva-panel.png</string>
++      </value>
++    </entry>
++    <entry>
++       <key>toplevels/top_panel/background/stretch</key>
++       <schema_key>/schemas/apps/panel/toplevels/background/stretch</schema_key>
++      <value>
++        <bool>true</bool>
++      </value>
++    </entry>
+ 
+     <entry><key>toplevels/top_panel/name</key><schema_key>/schemas/apps/panel/toplevels/name</schema_key></entry>
+     <entry><key>toplevels/top_panel/screen</key><schema_key>/schemas/apps/panel/toplevels/screen</schema_key></entry>
+@@ -109,12 +140,9 @@
+     <entry><key>toplevels/top_panel/unhide_delay</key><schema_key>/schemas/apps/panel/toplevels/unhide_delay</schema_key></entry>
+     <entry><key>toplevels/top_panel/auto_hide_size</key><schema_key>/schemas/apps/panel/toplevels/auto_hide_size</schema_key></entry>
+     <entry><key>toplevels/top_panel/animation_speed</key><schema_key>/schemas/apps/panel/toplevels/animation_speed</schema_key></entry>
+-    <entry><key>toplevels/top_panel/background/type</key><schema_key>/schemas/apps/panel/toplevels/background/type</schema_key></entry>
+     <entry><key>toplevels/top_panel/background/color</key><schema_key>/schemas/apps/panel/toplevels/background/color</schema_key></entry>
+     <entry><key>toplevels/top_panel/background/opacity</key><schema_key>/schemas/apps/panel/toplevels/background/opacity</schema_key></entry>
+-    <entry><key>toplevels/top_panel/background/image</key><schema_key>/schemas/apps/panel/toplevels/background/image</schema_key></entry>
+     <entry><key>toplevels/top_panel/background/fit</key><schema_key>/schemas/apps/panel/toplevels/background/fit</schema_key></entry>
+-    <entry><key>toplevels/top_panel/background/stretch</key><schema_key>/schemas/apps/panel/toplevels/background/stretch</schema_key></entry>
+     <entry><key>toplevels/top_panel/background/rotate</key><schema_key>/schemas/apps/panel/toplevels/background/rotate</schema_key></entry>
+ 
+   <!-- Bottom Panel -->
+@@ -127,6 +155,13 @@
+       </value>
+     </entry>
+     <entry>
++      <key>toplevels/bottom_panel/padding</key>
++      <schema_key>/schemas/apps/panel/toplevels/padding</schema_key>
++      <value>
++        <int>8</int>
++      </value>
++    </entry>
++    <entry>
+       <key>toplevels/bottom_panel/orientation</key>
+       <schema_key>/schemas/apps/panel/toplevels/orientation</schema_key>
+       <value>
+@@ -147,6 +182,27 @@
+         <int>0</int>
+       </value>
+     </entry>
++    <entry>
++       <key>toplevels/bottom_panel/background/type</key>
++       <schema_key>/schemas/apps/panel/toplevels/background/type</schema_key>
++       <value>
++         <string>image</string>      
++       </value>
++    </entry>
++    <entry>
++       <key>toplevels/bottom_panel/background/image</key>
++       <schema_key>/schemas/apps/panel/toplevels/background/image</schema_key>
++      <value>
++        <string>/usr/share/gnome-panel/pixmaps/mandriva-panel.png</string>
++      </value>
++    </entry>
++    <entry>
++       <key>toplevels/bottom_panel/background/stretch</key>
++       <schema_key>/schemas/apps/panel/toplevels/background/stretch</schema_key>
++      <value>
++        <bool>true</bool>
++      </value>
++    </entry>
+ 
+     <entry><key>toplevels/bottom_panel/name</key><schema_key>/schemas/apps/panel/toplevels/name</schema_key></entry>
+     <entry><key>toplevels/bottom_panel/screen</key><schema_key>/schemas/apps/panel/toplevels/screen</schema_key></entry>
+@@ -164,12 +220,9 @@
+     <entry><key>toplevels/bottom_panel/unhide_delay</key><schema_key>/schemas/apps/panel/toplevels/unhide_delay</schema_key></entry>
+     <entry><key>toplevels/bottom_panel/auto_hide_size</key><schema_key>/schemas/apps/panel/toplevels/auto_hide_size</schema_key></entry>
+     <entry><key>toplevels/bottom_panel/animation_speed</key><schema_key>/schemas/apps/panel/toplevels/animation_speed</schema_key></entry>
+-    <entry><key>toplevels/bottom_panel/background/type</key><schema_key>/schemas/apps/panel/toplevels/background/type</schema_key></entry>
+     <entry><key>toplevels/bottom_panel/background/color</key><schema_key>/schemas/apps/panel/toplevels/background/color</schema_key></entry>
+     <entry><key>toplevels/bottom_panel/background/opacity</key><schema_key>/schemas/apps/panel/toplevels/background/opacity</schema_key></entry>
+-    <entry><key>toplevels/bottom_panel/background/image</key><schema_key>/schemas/apps/panel/toplevels/background/image</schema_key></entry>
+     <entry><key>toplevels/bottom_panel/background/fit</key><schema_key>/schemas/apps/panel/toplevels/background/fit</schema_key></entry>
+-    <entry><key>toplevels/bottom_panel/background/stretch</key><schema_key>/schemas/apps/panel/toplevels/background/stretch</schema_key></entry>
+     <entry><key>toplevels/bottom_panel/background/rotate</key><schema_key>/schemas/apps/panel/toplevels/background/rotate</schema_key></entry>
+ 
+   <!-- Menu Bar -->
+@@ -240,7 +293,7 @@
+       <key>objects/browser_launcher/position</key>
+       <schema_key>/schemas/apps/panel/objects/position</schema_key>
+       <value>
+-        <int>1</int>
++        <int>2</int>
+       </value>
+     </entry>
+     <entry>
+@@ -261,7 +314,7 @@
+       <key>objects/browser_launcher/launcher_location</key>
+       <schema_key>/schemas/apps/panel/objects/launcher_location</schema_key>
+       <value>
+-        <string>epiphany.desktop</string>
++        <string>firefox.desktop</string>
+       </value>
+     </entry>
+ 
+@@ -294,7 +347,7 @@
+       <key>objects/email_launcher/position</key>
+       <schema_key>/schemas/apps/panel/objects/position</schema_key>
+       <value>
+-        <int>2</int>
++        <int>3</int>
+       </value>
+     </entry>
+     <entry>
+@@ -328,50 +381,104 @@
+     <entry><key>objects/email_launcher/menu_path</key><schema_key>/schemas/apps/panel/objects/menu_path</schema_key></entry>
+     <entry><key>objects/email_launcher/action_type</key><schema_key>/schemas/apps/panel/objects/action_type</schema_key></entry>
+ 
+-  <!-- Window Menu Applet -->
++  <!-- MCC Launcher -->
+ 
+     <entry>
+-      <key>applets/window_menu/object_type</key>
++      <key>applets/mcc_launcher/object_type</key>
+       <schema_key>/schemas/apps/panel/objects/object_type</schema_key>
+       <value>
+-        <string>bonobo-applet</string>
++        <string>launcher-object</string>
+       </value>
+     </entry>
+     <entry>
+-      <key>applets/window_menu/toplevel_id</key>
++      <key>applets/mcc_launcher/toplevel_id</key>
+       <schema_key>/schemas/apps/panel/objects/toplevel_id</schema_key>
+       <value>
+         <string>top_panel</string>
+       </value>
+     </entry>
+     <entry>
+-      <key>applets/window_menu/position</key>
++      <key>applets/mcc_launcher/position</key>
+       <schema_key>/schemas/apps/panel/objects/position</schema_key>
+       <value>
+-        <int>0</int>
++        <int>4</int>
+       </value>
+     </entry>
+     <entry>
+-      <key>applets/window_menu/panel_right_stick</key>
++      <key>applets/mcc_launcher/panel_right_stick</key>
+       <schema_key>/schemas/apps/panel/objects/panel_right_stick</schema_key>
+       <value>
+-        <bool>true</bool>
++        <bool>false</bool>
+       </value>
+     </entry>
+     <entry>
+-      <key>applets/window_menu/locked</key>
++      <key>objects/mcc_launcher/locked</key>
+       <schema_key>/schemas/apps/panel/objects/locked</schema_key>
+       <value>
+         <bool>true</bool>
+       </value>
+     </entry>
+     <entry>
+-      <key>applets/window_menu/applet_iid</key>
+-      <schema_key>/schemas/apps/panel/objects/applet_iid</schema_key>
++      <key>objects/mcc_launcher/launcher_location</key>
++      <schema_key>/schemas/apps/panel/objects/launcher_location</schema_key>
+       <value>
+-        <string>WnckletFactory::WindowMenuApplet</string>
++        <string>mandriva-drakconf.desktop</string>
+       </value>
+     </entry>
++    
++    <entry><key>objects/mcc_launcher/bonobo_iid</key><schema_key>/schemas/apps/panel/objects/bonobo_iid</schema_key></entry>
++    <entry><key>objects/mcc_launcher/attached_toplevel_id</key><schema_key>/schemas/apps/panel/objects/attached_toplevel_id</schema_key>
++    </entry>
++    <entry><key>objects/mcc_launcher/tooltip</key><schema_key>/schemas/apps/panel/objects/tooltip</schema_key></entry>
++    <entry><key>objects/mcc_launcher/use_custom_icon</key><schema_key>/schemas/apps/panel/objects/use_custom_icon</schema_key></entry>
++    <entry><key>objects/mcc_launcher/custom_icon</key><schema_key>/schemas/apps/panel/objects/custom_icon</schema_key></entry>
++    <entry><key>objects/mcc_launcher/use_menu_path</key><schema_key>/schemas/apps/panel/objects/use_menu_path</schema_key></entry>
++    <entry><key>objects/mcc_launcher/menu_path</key><schema_key>/schemas/apps/panel/objects/menu_path</schema_key></entry>
++    <entry><key>objects/mcc_launcher/action_type</key><schema_key>/schemas/apps/panel/objects/action_type</schema_key></entry>
++
++  <!-- Window Menu Applet -->
++     <entry>
++      <key>applets/window_menu/object_type</key>
++       <schema_key>/schemas/apps/panel/objects/object_type</schema_key>
++       <value>
++         <string>bonobo-applet</string>
++       </value>
++     </entry>
++     <entry>
++      <key>applets/window_menu/toplevel_id</key>
++       <schema_key>/schemas/apps/panel/objects/toplevel_id</schema_key>
++       <value>
++         <string>top_panel</string>
++       </value>
++     </entry>
++     <entry>
++      <key>applets/window_menu/position</key>
++       <schema_key>/schemas/apps/panel/objects/position</schema_key>
++       <value>
++        <int>0</int>
++       </value>
++     </entry>
++     <entry>
++      <key>applets/window_menu/panel_right_stick</key>
++       <schema_key>/schemas/apps/panel/objects/panel_right_stick</schema_key>
++       <value>
++         <bool>true</bool>
++       </value>
++     </entry>
++     <entry>
++      <key>applets/window_menu/locked</key>
++       <schema_key>/schemas/apps/panel/objects/locked</schema_key>
++       <value>
++         <bool>true</bool>
++       </value>
++     </entry>
++     <entry>
++      <key>applets/window_menu/bonobo_iid</key>
++       <schema_key>/schemas/apps/panel/objects/bonobo_iid</schema_key>
++       <value>
++        <string>WnckletFactory::WindowMenuApplet</string>
++       </value>
++     </entry>
+ 
+     <entry><key>applets/window_menu/attached_toplevel_id</key><schema_key>/schemas/apps/panel/objects/attached_toplevel_id</schema_key> </entry>
+     <entry><key>applets/window_menu/tooltip</key><schema_key>/schemas/apps/panel/objects/tooltip</schema_key></entry>
+@@ -517,7 +624,7 @@
+       <key>applets/show_desktop_button/panel_right_stick</key>
+       <schema_key>/schemas/apps/panel/objects/panel_right_stick</schema_key>
+       <value>
+-        <bool>false</bool>
++        <bool>true</bool>
+       </value>
+     </entry>
+     <entry>
+@@ -618,7 +725,7 @@
+       <key>applets/workspace_switcher/position</key>
+       <schema_key>/schemas/apps/panel/objects/position</schema_key>
+       <value>
+-        <int>0</int>
++        <int>4</int>
+       </value>
+     </entry>
+     <entry>
+diff -p -up gnome-panel-2.31.92/gnome-panel/panel-menu-bar.c.mdvcustomizations gnome-panel-2.31.92/gnome-panel/panel-menu-bar.c
+--- gnome-panel-2.31.92/gnome-panel/panel-menu-bar.c.mdvcustomizations	2010-06-23 01:00:28.000000000 +0200
++++ gnome-panel-2.31.92/gnome-panel/panel-menu-bar.c	2010-09-14 15:24:11.000000000 +0200
+@@ -42,6 +42,7 @@
+ #include "menu.h"
+ #include "panel-menu-items.h"
+ #include "panel-globals.h"
++#include "panel-config-global.h"
+ #include "panel-profile.h"
+ #include "panel-lockdown.h"
+ #include "panel-stock-icons.h"
+@@ -145,7 +146,7 @@ panel_menu_bar_init (PanelMenuBar *menub
+ 	menubar->priv->applications_item = panel_image_menu_item_new ();
+ 	gtk_menu_item_set_label (GTK_MENU_ITEM (menubar->priv->applications_item),
+ 				 _("Applications"));
+-	image = gtk_image_new_from_icon_name (PANEL_ICON_MAIN_MENU,
++	image = gtk_image_new_from_icon_name (panel_global_config_get_mdv_customization () ? "mandriva" : PANEL_ICON_MAIN_MENU,
+ 					      panel_menu_bar_icon_get_size ());
+ 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menubar->priv->applications_item),
+ 				       image);
+diff -p -up gnome-panel-2.31.92/gnome-panel/panel-menu-button.c.mdvcustomizations gnome-panel-2.31.92/gnome-panel/panel-menu-button.c
+--- gnome-panel-2.31.92/gnome-panel/panel-menu-button.c.mdvcustomizations	2010-06-23 01:00:28.000000000 +0200
++++ gnome-panel-2.31.92/gnome-panel/panel-menu-button.c	2010-09-14 15:24:11.000000000 +0200
+@@ -40,6 +40,7 @@
+ #include "panel-util.h"
+ #include "panel-profile.h"
+ #include "panel-globals.h"
++#include "panel-config-global.h"
+ #include "menu.h"
+ #include "panel-lockdown.h"
+ #include "panel-a11y.h"
+@@ -716,7 +717,7 @@ panel_menu_button_get_icon (PanelMenuBut
+ 	}
+ 
+ 	if (!retval)
+-		retval = g_strdup (PANEL_ICON_MAIN_MENU);
++		retval = g_strdup (panel_global_config_get_mdv_customization () ? "mandriva" : PANEL_ICON_MAIN_MENU);
+ 
+ 	return retval;
+ }
+diff -p -up gnome-panel-2.31.92/gnome-panel/panel-util.c.mdvcustomizations gnome-panel-2.31.92/gnome-panel/panel-util.c
+--- gnome-panel-2.31.92/gnome-panel/panel-util.c.mdvcustomizations	2010-09-14 15:24:11.000000000 +0200
++++ gnome-panel-2.31.92/gnome-panel/panel-util.c	2010-09-14 15:24:11.000000000 +0200
+@@ -250,6 +250,110 @@ panel_uri_exists (const char *uri)
+ 	return ret;
+ }
+ 
++static char *kde_icondir = NULL;
++static GSList *oxygen_kde_48 = NULL;
++static GSList *oxygen_kde_32 = NULL;
++static GSList *oxygen_kde_22 = NULL;
++static GSList *oxygen_kde_16 = NULL;
++
++static GSList *
++add_dirs (GSList *list, const char *dirname)
++{
++	DIR *dir;
++	struct dirent *dent;
++
++	dir = opendir (dirname);
++	if (dir == NULL)
++		return list;
++
++	list = g_slist_prepend (list, g_strdup (dirname));
++
++	while ((dent = readdir (dir)) != NULL) {
++		char *full;
++
++		/* skip hidden and self/parent references */
++		if (dent->d_name[0] == '.')
++			continue;
++
++		full = g_build_filename (dirname, dent->d_name, NULL);
++		if (g_file_test (full, G_FILE_TEST_IS_DIR)) {
++			list = g_slist_prepend (list, full);
++			list = add_dirs (list, full);
++		} else {
++			g_free (full);
++		}
++	}
++	closedir (dir);
++
++	return list;
++}
++
++
++static GSList *
++get_kde_dirs (int size)
++{
++	GSList *list = NULL;
++
++	if (kde_icondir == NULL) {
++		char *dirname;
++
++		kde_icondir = g_build_filename ("/usr", "share", "icons", NULL);
++
++
++#define ADD_DIRS(color,size) \
++	dirname = g_build_filename (kde_icondir, #color,	\
++				    #size "x" #size , NULL);	\
++	color ## _kde_ ## size = add_dirs (NULL, dirname);	\
++	g_free (dirname);
++
++		ADD_DIRS (oxygen, 48);
++		ADD_DIRS (oxygen, 32);
++		ADD_DIRS (oxygen, 22);
++		ADD_DIRS (oxygen, 16);
++
++#undef ADD_DIRS		
++
++	}
++
++	if (size > 32) {
++		/* 48-inf */
++		list = g_slist_concat (g_slist_copy (oxygen_kde_48),
++				       g_slist_copy (oxygen_kde_32));
++		list = g_slist_concat (list,
++				       g_slist_copy (oxygen_kde_22));
++		list = g_slist_concat (list,
++				       g_slist_copy (oxygen_kde_16));
++	} else if (size > 22) {
++		/* 23-32 */
++		list = g_slist_concat (g_slist_copy (oxygen_kde_32),
++				       g_slist_copy (oxygen_kde_48));
++		list = g_slist_concat (list,
++				       g_slist_copy (oxygen_kde_22));
++		list = g_slist_concat (list,
++				       g_slist_copy (oxygen_kde_16));
++	} else if (size > 16) {
++		/* 17-22 */
++		list = g_slist_concat (g_slist_copy (oxygen_kde_22),
++				       g_slist_copy (oxygen_kde_32));
++		list = g_slist_concat (list,
++				       g_slist_copy (oxygen_kde_48));
++		list = g_slist_concat (list,
++				       g_slist_copy (oxygen_kde_16));
++	} else {
++		/* 1-16 */
++		list = g_slist_concat (g_slist_copy (oxygen_kde_16),
++				       g_slist_copy (oxygen_kde_22));
++		list = g_slist_concat (list,
++				       g_slist_copy (oxygen_kde_32));
++		list = g_slist_concat (list,
++				       g_slist_copy (oxygen_kde_48));
++	}
++
++	list = g_slist_append (list, kde_icondir);
++
++	return list;
++}
++
+ char *
+ panel_find_icon (GtkIconTheme  *icon_theme,
+ 		 const char    *icon_name,
+@@ -284,13 +388,32 @@ panel_find_icon (GtkIconTheme  *icon_the
+ 	info = gtk_icon_theme_lookup_icon (icon_theme, icon_no_extension,
+ 					   size, 0);
+ 
+-	g_free (icon_no_extension);
+ 
+ 	if (info) {
+ 		retval = g_strdup (gtk_icon_info_get_filename (info));
+ 		gtk_icon_info_free (info);
+-	} else
+-		retval = NULL;
++	} else {
++		const char *exts[] = { ".png", ".xpm", ".svg", NULL };
++		GSList *kde_dirs = NULL;
++		GSList *li;
++
++	kde_dirs = get_kde_dirs (size);	
++	retval = NULL;
++
++	for (li = kde_dirs; retval == NULL && li != NULL; li = li->next) {
++			int i;
++			for (i = 0; retval == NULL && exts[i] != NULL; i++) {
++				retval = g_strconcat (li->data, G_DIR_SEPARATOR_S, icon_no_extension,
++						    exts[i], NULL);
++				if ( ! g_file_test (retval, G_FILE_TEST_EXISTS)) {
++					g_free (retval);
++					retval = NULL;
++				}
++			}
++		}
++	}
++
++	g_free (icon_no_extension);
+ 
+ 	return retval;
+ }

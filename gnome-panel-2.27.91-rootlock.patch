@@ -1,0 +1,80 @@
+From 4c746261f8fee923c3790df42822b808d4408233 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Fri, 11 May 2007 14:12:17 +0000
+Subject: [PATCH 1/4] rootlock
+
+---
+ gnome-panel/panel-action-button.c |    8 ++++++--
+ gnome-panel/panel-util.c          |    6 ++++--
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/gnome-panel/panel-action-button.c b/gnome-panel/panel-action-button.c
+index ad8e64a..0012917 100644
+--- a/gnome-panel/panel-action-button.c
++++ b/gnome-panel/panel-action-button.c
+@@ -27,6 +27,8 @@
+ #include <config.h>
+ #include <string.h>
+ #include <stdlib.h>
++#include <unistd.h>
++#include <sys/types.h>
+ 
+ #include "panel-action-button.h"
+ 
+@@ -123,23 +125,25 @@ panel_action_lock_is_disabled (void)
+ static void
+ panel_action_lock_setup_menu (PanelActionButton *button)
+ {
++   if (getuid() != 0) {
+ 	panel_applet_add_callback (button->priv->info,
+ 				   "activate",
+ 				   NULL,
+ 				   _("_Activate Screensaver"),
+ 				   screensaver_enabled);
+-
++   }
+ 	panel_applet_add_callback (button->priv->info,
+ 				   "lock",
+ 				   NULL,
+ 				   _("_Lock Screen"),
+ 				   screensaver_enabled);
+-
++   if (getuid() != 0) {
+ 	panel_applet_add_callback (button->priv->info,
+ 				   "prefs",
+ 				   GTK_STOCK_PROPERTIES,
+ 				   _("_Properties"),
+ 				   screensaver_properties_enabled);
++  }
+ }
+ 
+ static void
+diff --git a/gnome-panel/panel-util.c b/gnome-panel/panel-util.c
+index 4b00d91..99f2961 100644
+--- a/gnome-panel/panel-util.c
++++ b/gnome-panel/panel-util.c
+@@ -351,17 +351,19 @@ panel_lock_screen_action_get_command (const char *action)
+ 	if (panel_is_program_in_path ("gnome-screensaver-command")
+ 	    && panel_is_program_in_path ("gnome-screensaver-preferences"))
+ 		use_gscreensaver = TRUE;
+-	else if (!panel_is_program_in_path ("xscreensaver-command"))
++	else if (!(getuid() == 0) && panel_is_program_in_path ("xlockmore") && !((getuid() != 0) && panel_is_program_in_path ("xscreensaver-command")))
+ 		return NULL;
+ 
+ 	if (strcmp (action, "prefs") == 0) {
+ 		if (use_gscreensaver) {
+ 			command = g_strdup ("gnome-screensaver-preferences");
+-		} else if (panel_is_program_in_path ("xscreensaver-demo")) {
++		} else if (getuid() && panel_is_program_in_path ("xscreensaver-demo")) {
+ 			command = g_strdup ("xscreensaver-demo");
+ 		} else {
+ 			command = NULL;
+ 		}
++	} else if (getuid () == 0 && strcmp( action, "lock") == 0) {
++		command = g_strdup ("xlock");
+ 	} else if (strcmp (action, "activate") == 0
+ 		   || strcmp (action, "lock") == 0) {
+ 		/* Neither gnome-screensaver or xscreensaver allow root
+-- 
+1.6.4.4
+

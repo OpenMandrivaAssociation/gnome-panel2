@@ -1,0 +1,24 @@
+From 1c6cb662bd5e7479aabe2b844e366be57aeeacea Mon Sep 17 00:00:00 2001
+From: Frederic Crozat <fcrozat@mandriva.com>
+Date: Mon, 26 Oct 2009 15:22:36 +0100
+Subject: [PATCH] about mandriva
+
+---
+ gnome-panel/panel-menu-items.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/gnome-panel/panel-menu-items.c b/gnome-panel/panel-menu-items.c
+index ae30831..8c951f3 100644
+--- a/gnome-panel/panel-menu-items.c
++++ b/gnome-panel/panel-menu-items.c
+@@ -1171,6 +1171,7 @@ panel_desktop_menu_item_append_menu (GtkWidget *menu,
+ 
+ 	panel_menu_items_append_from_desktop (menu, "yelp.desktop", NULL, FALSE);
+ 	panel_menu_items_append_from_desktop (menu, "gnome-about.desktop", NULL, FALSE);
++	panel_menu_items_append_from_desktop (menu, "about-mandriva.desktop", NULL, FALSE);
+ 
+ 	if (parent->priv->append_lock_logout)
+ 		panel_menu_items_append_lock_logout (menu);
+-- 
+1.6.4.4
+

@@ -1,0 +1,123 @@
+From 64828793269d86033e115397d3cb0e46eab36518 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Tue, 25 Aug 2009 15:38:52 +0000
+Subject: [PATCH 3/9] search
+
+---
+ gnome-panel/libpanel-util/panel-launch.c |   19 +++++++++++++++++++
+ gnome-panel/libpanel-util/panel-launch.h |    2 ++
+ gnome-panel/panel-action-button.c        |   16 +++++++++++++---
+ gnome-panel/panel-menu-items.c           |   20 ++++++++++++++++----
+ 4 files changed, 50 insertions(+), 7 deletions(-)
+
+diff --git a/gnome-panel/libpanel-util/panel-launch.c b/gnome-panel/libpanel-util/panel-launch.c
+index af2b428..ef1afec 100644
+--- a/gnome-panel/libpanel-util/panel-launch.c
++++ b/gnome-panel/libpanel-util/panel-launch.c
+@@ -29,6 +29,8 @@
+ #include <gdk/gdk.h>
+ #include <gtk/gtk.h>
+ 
++#include <libgnome/gnome-desktop-item.h>
++
+ #include "panel-error.h"
+ #include "panel-glib.h"
+ 
+@@ -201,6 +203,23 @@ panel_launch_desktop_file (const char  *desktop_file,
+ }
+ 
+ gboolean
++panel_has_desktop_file (const char  *desktop_file)
++{
++	GnomeDesktopItem *ditem;
++
++	if (g_path_is_absolute (desktop_file))
++		ditem = gnome_desktop_item_new_from_file (desktop_file, 0, NULL);
++	else
++		ditem = gnome_desktop_item_new_from_basename (desktop_file, 0, NULL);
++	if (ditem != NULL) {
++		gnome_desktop_item_unref (ditem);
++		return TRUE;
++	}
++
++	return FALSE;	
++}
++
++gboolean
+ panel_launch_desktop_file_with_fallback (const char  *desktop_file,
+ 					 const char  *fallback_exec,
+ 					 GdkScreen   *screen,
+diff --git a/gnome-panel/libpanel-util/panel-launch.h b/gnome-panel/libpanel-util/panel-launch.h
+index 48f8ca4..972869d 100644
+--- a/gnome-panel/libpanel-util/panel-launch.h
++++ b/gnome-panel/libpanel-util/panel-launch.h
+@@ -47,6 +47,8 @@ gboolean panel_launch_key_file (GKeyFile   *keyfile,
+ 				GdkScreen  *screen,
+ 				GError    **error);
+ 
++gboolean panel_has_desktop_file (const char *desktop_file);
++
+ gboolean panel_launch_desktop_file (const char  *desktop_file,
+ 				    GdkScreen   *screen,
+ 				    GError     **error);
+diff --git a/gnome-panel/panel-action-button.c b/gnome-panel/panel-action-button.c
+index 0012917..508a5f5 100644
+--- a/gnome-panel/panel-action-button.c
++++ b/gnome-panel/panel-action-button.c
+@@ -223,9 +223,19 @@ panel_action_search (GtkWidget *widget)
+ 	GdkScreen *screen;
+ 
+ 	screen = gtk_widget_get_screen (widget);
+-	panel_launch_desktop_file_with_fallback ("gnome-search-tool.desktop",
+-						 "gnome-search-tool",
+-						 screen, NULL);
++	if (panel_has_desktop_file ("tracker-search-tool.desktop")) {
++		panel_launch_desktop_file ("tracker-search-tool.desktop",
++					   screen,
++					   NULL);
++	} else if (panel_has_desktop_file ("beagle-search.desktop")) {
++		panel_launch_desktop_file ("beagle-search.desktop",
++					   screen,
++					   NULL);
++	} else {
++		panel_launch_desktop_file ("gnome-search-tool.desktop",
++					   screen,
++					   NULL);
++	}
+ }
+ 
+ /* Force Quit
+diff --git a/gnome-panel/panel-menu-items.c b/gnome-panel/panel-menu-items.c
+index 778a38b..688e230 100644
+--- a/gnome-panel/panel-menu-items.c
++++ b/gnome-panel/panel-menu-items.c
+@@ -1099,10 +1099,22 @@ panel_place_menu_item_create_menu (PanelPlaceMenuItem *place_item)
+ 
+ 	add_menu_separator (places_menu);
+ 
+-	panel_menu_items_append_from_desktop (places_menu,
+-					      "gnome-search-tool.desktop",
+-					      NULL,
+-                                              FALSE);
++        if (panel_has_desktop_file ("tracker-search-tool.desktop")) {
++              panel_menu_items_append_from_desktop (places_menu,
++                                                    "tracker-search-tool.desktop",
++                                                    NULL,
++						    FALSE);
++	} else if (panel_has_desktop_file ("beagle-search.desktop")) {
++              panel_menu_items_append_from_desktop (places_menu,
++                                                    "beagle-search.desktop",
++                                                    NULL,
++						    FALSE);
++        } else {
++              panel_menu_items_append_from_desktop (places_menu,
++                                                    "gnome-search-tool.desktop",
++                                                    NULL,
++						    FALSE);
++		}
+ 
+ 	panel_recent_append_documents_menu (places_menu,
+ 					    place_item->priv->recent_manager);
+-- 
+1.7.1
+

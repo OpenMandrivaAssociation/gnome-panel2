@@ -1,0 +1,29 @@
+--- gnome-panel-2.32.1/applets/notification_area/Makefile.am.0002~	2010-09-20 17:49:51.000000000 +0200
++++ gnome-panel-2.32.1/applets/notification_area/Makefile.am	2011-12-15 12:54:27.991026483 +0100
+@@ -33,13 +33,13 @@ NOTIFICATION_AREA_LDADD =				\
+ 	$(X_LIBS)					\
+ 	$(NOTIFICATION_AREA_LIBS)			\
+ 	$(LIBPANEL_APPLET_LIBS)				\
+-	libtray.la
++	libtray.la -lgdk-x11-2.0 -lcairo -lX11
+ 
+ testtray_SOURCES = testtray.c
+ testtray_LDADD =			\
+ 	$(X_LIBS)			\
+ 	$(NOTIFICATION_AREA_LIBS)	\
+-	libtray.la
++	libtray.la -lcairo -lX11
+ 
+ if NOTIFICATION_AREA_INPROCESS
+ APPLET_IN_PROCESS = true
+--- gnome-panel-2.32.1/gnome-panel/Makefile.am.0002~	2010-09-29 18:51:03.000000000 +0200
++++ gnome-panel-2.32.1/gnome-panel/Makefile.am	2011-12-15 12:52:48.751489402 +0100
+@@ -134,7 +134,7 @@ gnome_panel_LDADD =		\
+ 	$(top_builddir)/gnome-panel/libpanel-util/libpanel-util.la			\
+ 	$(PANEL_LIBS)									\
+ 	$(XRANDR_LIBS)									\
+-	$(X_LIBS)
++	$(X_LIBS) -lm
+ 
+ gnome_panel_LDFLAGS = -export-dynamic
+ 

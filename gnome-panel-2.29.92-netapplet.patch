@@ -1,0 +1,11 @@
+diff -p -up gnome-panel-2.29.92/applets/notification_area/na-tray.c.netapplet gnome-panel-2.29.92/applets/notification_area/na-tray.c
+--- gnome-panel-2.29.92/applets/notification_area/na-tray.c.netapplet	2010-03-09 06:43:43.000000000 +0100
++++ gnome-panel-2.29.92/applets/notification_area/na-tray.c	2010-03-09 09:38:54.000000000 +0100
+@@ -132,6 +132,7 @@ const char *wmclass_roles[] = {
+   "Nm-applet", "network",
+   "Gnome-power-manager", "battery",
+   "keyboard", "keyboard",
++  "Net_applet", "network",
+   NULL,
+ };
+ 
