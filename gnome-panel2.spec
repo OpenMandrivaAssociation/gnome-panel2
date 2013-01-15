@@ -42,6 +42,7 @@ Patch21:	gnome-panel-2.28.0-about-mandriva.patch
 Patch22:	gnome-panel-2.30.0-panel-padding.patch
 # (fc) add padding for icons in notification area (GNOME bug #583273)
 Patch23:	gnome-panel-2.31.6-icon-padding.patch
+Patch24:	gnome-panel-2.32.1-automake-1.13.patch
 URL:		http://www.gnome.org/
 BuildRequires:	pkgconfig(gnome-desktop-2.0) >= %{req_gnomedesktop_version}
 BuildRequires:	pkgconfig(libglade-2.0) >= %{req_libglade_version}
@@ -126,7 +127,7 @@ Panel libraries and header files for creating GNOME panels.
 %setup -q -n %{oname}-%{version}
 %apply_patches
 
-#needed by patch2,patch23
+#needed by patch2,patch23,patch24
 autoreconf
 
 %build
