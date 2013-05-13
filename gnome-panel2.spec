@@ -47,7 +47,7 @@ URL:		http://www.gnome.org/
 BuildRequires:	pkgconfig(gnome-desktop-2.0) >= %{req_gnomedesktop_version}
 BuildRequires:	pkgconfig(libglade-2.0) >= %{req_libglade_version}
 BuildRequires:	pkgconfig(libwnck-1.0) >= %{req_libwnck_version}
-BuildRequires:	libxres-devel
+BuildRequires:	pkgconfig(xres)
 BuildRequires:	pkgconfig(libpng)
 BuildRequires:	pkgconfig(librsvg-2.0)
 BuildRequires:	libgweather2-devel >= 2.27.90
