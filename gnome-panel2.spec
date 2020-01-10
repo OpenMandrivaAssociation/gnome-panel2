@@ -125,7 +125,7 @@ Panel libraries and header files for creating GNOME panels.
 
 %prep
 %setup -q -n %{oname}-%{version}
-%apply_patches
+%autopatch -p1
 
 #needed by patch2,patch23,patch24
 autoreconf
