@@ -43,7 +43,7 @@ Patch22:	gnome-panel-2.30.0-panel-padding.patch
 # (fc) add padding for icons in notification area (GNOME bug #583273)
 Patch23:	gnome-panel-2.31.6-icon-padding.patch
 Patch24:	gnome-panel-2.32.1-automake-1.13.patch
-URL:		http://www.gnome.org/
+URL:		https://www.gnome.org/
 BuildRequires:	pkgconfig(gnome-desktop-2.0) >= %{req_gnomedesktop_version}
 BuildRequires:	pkgconfig(libglade-2.0) >= %{req_libglade_version}
 BuildRequires:	pkgconfig(libwnck-1.0) >= %{req_libwnck_version}
